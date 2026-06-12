@@ -62,9 +62,9 @@ export function SiteHeader() {
             Browse shop
           </Link>
           <Link
-            href="/shop"
+            href="/cart"
             className="relative inline-flex h-11 w-11 items-center justify-center rounded-full bg-[#20303d] text-white shadow-lg shadow-[#20303d]/15"
-            aria-label="View shop"
+            aria-label="View cart"
           >
             <ShoppingBag className="h-5 w-5" />
             {itemCount > 0 ? (
