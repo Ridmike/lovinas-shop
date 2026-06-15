@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Gift, Package, Sparkles, Star, Users } from "lucide-react";
-import { categoryLookup } from "@/lib/data";
 import type { Category, Product } from "@/types/catalog";
 import { formatCurrency } from "@/lib/format";
 
@@ -28,7 +27,7 @@ export function SectionHeading({
 export function HeroBanner() {
   return (
     <section className="relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(154,61,47,0.16),_transparent_38%),radial-gradient(circle_at_bottom_right,_rgba(197,139,69,0.18),_transparent_32%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(154,61,47,0.16),transparent_38%),radial-gradient(circle_at_bottom_right,rgba(197,139,69,0.18),transparent_32%)]" />
       <div className="content-shell relative grid gap-8 py-12 lg:grid-cols-[1.15fr_0.85fr] lg:py-16">
         <div className="glass-panel rounded-[2.5rem] p-8 md:p-12">
           <span className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-[#9a3d2f] shadow-sm">
@@ -81,13 +80,13 @@ export function HeroBanner() {
             <p className="mt-3 max-w-sm text-sm leading-7 text-white/75">
               Designed for birthdays, thank-yous, and seasonal gifting with polished presentation.
             </p>
-            <div className="mt-8 rounded-[2rem] bg-white/10 p-4">
+            <div className="mt-8 rounded-4xl bg-white/10 p-4">
               <p className="text-sm text-white/70">Average order value</p>
               <p className="mt-1 text-3xl font-semibold">{formatCurrency(6400)}</p>
             </div>
           </div>
-          <div className="overflow-hidden rounded-[2.5rem] border border-black/5 bg-white p-4 shadow-lg shadow-[#9a3d2f]/5">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem]">
+            <div className="overflow-hidden rounded-[2.5rem] border border-black/5 bg-white p-4 shadow-lg shadow-[#9a3d2f]/5">
+              <div className="relative aspect-4/5 overflow-hidden rounded-4xl">
               <Image
                 src="https://images.unsplash.com/photo-1512909006721-3d6018887383?auto=format&fit=crop&w=1200&q=80"
                 alt="Gift boxes arranged on a styled table"
@@ -133,7 +132,7 @@ export function CategoriesSection({ categories }: { categories: Category[] }) {
           <Link
             key={category.id}
             href={`/shop?category=${category.slug}`}
-            className="group rounded-[2rem] border border-black/5 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#9a3d2f]/8"
+            className="group rounded-4xl border border-black/5 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#9a3d2f]/8"
           >
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#9a3d2f]">Collection</p>
             <h3 className="mt-4 font-display text-xl font-semibold text-[#20303d]">
@@ -164,7 +163,7 @@ export function PromotionSection() {
             polished gift experience without leaving your phone.
           </p>
         </div>
-        <div className="rounded-[2rem] bg-white/12 p-6">
+        <div className="rounded-4xl bg-white/12 p-6">
           <p className="text-sm text-white/70">Designed for</p>
           <div className="mt-4 flex flex-wrap gap-3">
             {["Birthdays", "Anniversaries", "Teacher gifts", "Corporate hampers"].map((label) => (
@@ -193,7 +192,7 @@ export function SocialSection() {
           { label: "WhatsApp orders", value: "Fast replies and shareable product links" },
           { label: "Facebook shop", value: "Collections that map cleanly to catalog ads" },
         ].map((item) => (
-          <div key={item.label} className="rounded-[2rem] border border-black/5 bg-white p-6 shadow-sm">
+          <div key={item.label} className="rounded-4xl border border-black/5 bg-white p-6 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#9a3d2f]">{item.label}</p>
             <p className="mt-3 text-sm leading-7 text-slate-600">{item.value}</p>
             <div className="mt-6 flex items-center gap-2 text-sm font-semibold text-[#20303d]">
@@ -208,14 +207,12 @@ export function SocialSection() {
 }
 
 function ProductCard({ product }: { product: Product }) {
-  const category = categoryLookup.get(product.categoryId);
-
   return (
     <Link
       href={`/products/${product.slug}`}
-      className="group overflow-hidden rounded-[2rem] border border-black/5 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-[#9a3d2f]/10"
+      className="group overflow-hidden rounded-4xl border border-black/5 bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-[#9a3d2f]/10"
     >
-      <div className="relative aspect-[4/3] overflow-hidden rounded-[1.5rem] bg-[#f4ece0]">
+      <div className="relative aspect-4/3 overflow-hidden rounded-3xl bg-[#f4ece0]">
         <Image
           src={product.images[0]}
           alt={product.name}
@@ -231,7 +228,7 @@ function ProductCard({ product }: { product: Product }) {
       </div>
       <div className="px-1 pb-2 pt-4">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#9a3d2f]">
-          {category?.name ?? "Collection"}
+          {product.categoryName ?? "Collection"}
         </p>
         <h3 className="mt-2 text-lg font-semibold text-[#20303d]">{product.name}</h3>
         <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">{product.description}</p>
