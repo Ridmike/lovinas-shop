@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import type { Category, Product } from "@/types/catalog";
 import { formatCurrency } from "@/lib/format";
 import { useCartStore } from "@/store/cart-store";
+import { trackFacebookEvent, trackTikTokEvent } from "@/lib/marketing";
 
 export function SearchControls({ categories }: { categories: Category[] }) {
   const router = useRouter();
@@ -45,7 +46,7 @@ export function SearchControls({ categories }: { categories: Category[] }) {
   }
 
   return (
-    <div className="grid gap-4 rounded-[2rem] border border-black/5 bg-white p-4 shadow-sm md:grid-cols-[1.2fr_0.8fr_auto]">
+    <div className="grid gap-4 rounded-4xl border border-black/5 bg-white p-4 shadow-sm md:grid-cols-[1.2fr_0.8fr_auto]">
       <label className="flex items-center gap-3 rounded-2xl border border-black/10 bg-[#fffaf4] px-4 py-3">
         <Search className="h-4 w-4 text-slate-500" />
         <input
@@ -146,7 +147,7 @@ export function ProductGallery({ product }: { product: Product }) {
 
   return (
     <div className="space-y-4">
-      <div className="relative aspect-square overflow-hidden rounded-[2rem] bg-white shadow-lg shadow-[#9a3d2f]/5">
+      <div className="relative aspect-square overflow-hidden rounded-4xl bg-white shadow-lg shadow-[#9a3d2f]/5">
         <Image src={activeImage} alt={product.name} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
       </div>
       <div className="grid grid-cols-3 gap-3">
@@ -211,6 +212,8 @@ export function AddToCartButton({ product }: { product: Product }) {
             },
             quantity,
           );
+          trackFacebookEvent("AddToCart", { content_name: product.name, content_ids: [product.id], value: product.price * quantity, currency: "INR" });
+          trackTikTokEvent("AddToCart", { content_name: product.name, content_id: product.id, value: product.price * quantity, currency: "INR" });
           toast.success(`${product.name} added to your cart.`);
         }}
         className="inline-flex items-center gap-2 rounded-full bg-[#9a3d2f] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#9a3d2f]/20 transition hover:bg-[#7d2e23]"
@@ -232,7 +235,7 @@ export function CartSummary({ className }: { className?: string }) {
 
   return (
     <aside className={className ?? ""}>
-      <div className="rounded-[2rem] border border-black/5 bg-white p-6 shadow-sm">
+      <div className="rounded-4xl border border-black/5 bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between gap-3">
           <h2 className="font-display text-2xl font-semibold text-[#20303d]">Cart summary</h2>
           <button type="button" onClick={clearCart} className="text-sm font-medium text-[#9a3d2f]">

@@ -5,14 +5,15 @@ import { AddToCartButton, ProductGallery } from "@/components/catalog-interactiv
 import { ProductGrid } from "@/components/catalog-static";
 import { SectionHeading } from "@/components/marketing-sections";
 import { EmptyState } from "@/components/states";
-import { categoryLookup, getProductsByCategoryId, getProductBySlug } from "@/lib/data";
+import { getCategoryById, getProductsByCategoryId, getProductBySlug } from "@/lib/storefront-data";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { ProductViewTracker } from "@/components/product-view-tracker";
 
 type Params = Promise<{ slug: string }>;
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
 
   if (!product) {
     return { title: "Product not found" };
@@ -26,14 +27,14 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
 export default async function ProductDetailsPage({ params }: { params: Params }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
 
   if (!product) {
     notFound();
   }
 
-  const category = categoryLookup.get(product.categoryId) ?? null;
-  const relatedProducts = getProductsByCategoryId(product.categoryId, product.slug).slice(0, 3);
+  const category = (await getCategoryById(product.categoryId)) ?? null;
+  const relatedProducts = (await getProductsByCategoryId(product.categoryId, product.slug)).slice(0, 3);
 
   return (
     <div className="content-shell py-10 md:py-14">
@@ -50,9 +51,10 @@ export default async function ProductDetailsPage({ params }: { params: Params })
       </div>
 
       <div className="grid gap-10 lg:grid-cols-[1fr_0.9fr]">
+        <ProductViewTracker productId={product.id} name={product.name} price={product.price} />
         <ProductGallery product={product} />
 
-        <div className="space-y-6 rounded-[2rem] border border-black/5 bg-white p-6 shadow-sm md:p-8">
+        <div className="space-y-6 rounded-4xl border border-black/5 bg-white p-6 shadow-sm md:p-8">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#9a3d2f]">
               {category?.name ?? "Collection"}
@@ -71,7 +73,7 @@ export default async function ProductDetailsPage({ params }: { params: Params })
 
           <p className="text-sm leading-8 text-slate-600 md:text-base">{product.description}</p>
 
-          <div className="rounded-[1.5rem] bg-[#fff8f0] p-5 text-sm leading-7 text-slate-700">
+          <div className="rounded-3xl bg-[#fff8f0] p-5 text-sm leading-7 text-slate-700">
             <p className="font-semibold text-[#20303d]">Product details</p>
             <ul className="mt-3 space-y-2">
               <li>Added to catalogue on {formatDate(product.createdAt)}</li>

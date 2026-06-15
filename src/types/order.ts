@@ -2,7 +2,7 @@ import type { CartItem } from "@/store/cart-store";
 
 export type PaymentMethod = "COD";
 export type PaymentStatus = "unpaid" | "paid" | "failed";
-export type OrderStatus = "pending" | "confirmed" | "shipped" | "delivered" | "cancelled";
+export type OrderStatus = "pending" | "processing" | "dispatched" | "delivered" | "cancelled";
 
 export interface OrderItem extends CartItem {
   subtotal: number;

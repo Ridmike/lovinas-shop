@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, Package, MapPin, Mail, Phone } from "lucide-react";
 import { getOrderById } from "@/service/order.service";
+import { PurchaseTracker } from "@/components/purchase-tracker";
 
 interface PageProps {
   params: Promise<{ orderId: string }>;
@@ -29,8 +30,9 @@ export default async function OrderSuccessPage({ params }: PageProps) {
   const createdDate = new Date(order.createdAt);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white py-12 px-4">
+    <div className="min-h-screen bg-linear-to-b from-green-50 to-white py-12 px-4">
       <div className="max-w-2xl mx-auto">
+        <PurchaseTracker orderNumber={order.orderNumber} total={order.total} />
         {/* Success Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
@@ -46,7 +48,7 @@ export default async function OrderSuccessPage({ params }: PageProps) {
         </div>
 
         {/* Order Number Card */}
-        <div className="bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg shadow-lg p-8 text-white text-center mb-8">
+        <div className="bg-linear-to-r from-green-600 to-emerald-600 rounded-lg shadow-lg p-8 text-white text-center mb-8">
           <p className="text-sm font-semibold opacity-90 mb-2">ORDER NUMBER</p>
           <p className="text-4xl font-bold tracking-wider">{order.orderNumber}</p>
           <p className="text-sm opacity-75 mt-4">
@@ -181,7 +183,7 @@ export default async function OrderSuccessPage({ params }: PageProps) {
         )}
 
         {/* Next Steps */}
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-6 mb-8">
+        <div className="bg-linear-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-6 mb-8">
           <h3 className="font-bold text-gray-900 mb-3">✨ What Happens Next?</h3>
           <ul className="space-y-2 text-sm text-gray-700">
             <li>✓ We're preparing your order for shipment</li>
@@ -195,7 +197,7 @@ export default async function OrderSuccessPage({ params }: PageProps) {
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             href="/shop"
-            className="flex-1 text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition"
+            className="flex-1 text-center bg-linear-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition"
           >
             Continue Shopping
           </Link>

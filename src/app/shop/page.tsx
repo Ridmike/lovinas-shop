@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { categories, filterProducts } from "@/lib/data";
+import { getCategories, filterProducts } from "@/lib/storefront-data";
 import { Pagination, SearchControls } from "@/components/catalog-interactive";
 import { EmptyState } from "@/components/states";
 import { SectionHeading } from "@/components/marketing-sections";
@@ -23,10 +23,11 @@ export default async function ShopPage({
   searchParams: SearchParams;
 }) {
   const resolvedSearchParams = await searchParams;
+  const categories = await getCategories();
   const query = firstString(resolvedSearchParams.q) ?? "";
   const category = firstString(resolvedSearchParams.category) ?? "";
   const page = Number(firstString(resolvedSearchParams.page) ?? "1");
-  const result = filterProducts({ query, category, page, pageSize: 6 });
+  const result = await filterProducts({ query, category, page, pageSize: 6 });
 
   return (
     <div className="content-shell py-10 md:py-14">
@@ -71,7 +72,7 @@ export default async function ShopPage({
       </div>
 
       <section className="mt-14 grid gap-6 lg:grid-cols-[0.75fr_1.25fr]">
-        <div className="rounded-[2rem] bg-[#20303d] p-6 text-white">
+        <div className="rounded-4xl bg-[#20303d] p-6 text-white">
           <p className="text-xs uppercase tracking-[0.24em] text-white/55">Need help choosing?</p>
           <h2 className="font-display mt-3 text-3xl font-semibold">Products selected for easy gifting</h2>
           <p className="mt-3 text-sm leading-7 text-white/75">
@@ -86,7 +87,7 @@ export default async function ShopPage({
               <Link
                 key={categoryItem.id}
                 href={`/shop?category=${categoryItem.slug}`}
-                className="rounded-[2rem] border border-black/5 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#9a3d2f]/10"
+                className="rounded-4xl border border-black/5 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#9a3d2f]/10"
               >
                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#9a3d2f]">Collection</p>
                 <h3 className="mt-3 font-display text-xl font-semibold text-[#20303d]">{categoryItem.name}</h3>

@@ -9,6 +9,7 @@ import { useCartStore } from "@/store/cart-store";
 import Link from "next/link";
 import { ShoppingCart, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+import { trackFacebookEvent, trackTikTokEvent } from "@/lib/marketing";
 
 // Validation schema
 const checkoutSchema = z.object({
@@ -27,6 +28,9 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const { items, clearCart } = useCartStore();
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const tax = 0;
+  const total = subtotal + tax;
 
   const {
     register,
@@ -39,14 +43,16 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     setIsMounted(true);
+    trackFacebookEvent("InitiateCheckout", { value: subtotal, currency: "INR" });
+    trackTikTokEvent("InitiateCheckout", { value: subtotal, currency: "INR" });
     if (items.length === 0 && isMounted) {
       router.push("/cart");
     }
-  }, [items, isMounted, router]);
+  }, [items, isMounted, router, subtotal]);
 
   if (!isMounted) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white py-12 px-4">
+      <div className="min-h-screen bg-linear-to-b from-purple-50 to-white py-12 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="h-screen bg-gray-200 animate-pulse rounded-lg" />
         </div>
@@ -57,10 +63,6 @@ export default function CheckoutPage() {
   if (items.length === 0) {
     return null;
   }
-
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const tax = 0;
-  const total = subtotal + tax;
 
   const onSubmit = async (data: CheckoutFormData) => {
     setIsSubmitting(true);
@@ -83,6 +85,9 @@ export default function CheckoutPage() {
 
       const { order } = await response.json();
 
+      trackFacebookEvent("Purchase", { value: total, currency: "INR", order_id: order.orderNumber });
+      trackTikTokEvent("CompletePayment", { value: total, currency: "INR", order_id: order.orderNumber });
+
       // Clear cart and redirect to success page
       clearCart();
       toast.success("Order created successfully!");
@@ -97,7 +102,7 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white py-12 px-4">
+    <div className="min-h-screen bg-linear-to-b from-purple-50 to-white py-12 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
@@ -243,7 +248,7 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-linear-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSubmitting ? (
                   <>
@@ -269,7 +274,7 @@ export default function CheckoutPage() {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg shadow-lg p-6 text-white sticky top-4">
+            <div className="bg-linear-to-br from-purple-600 to-pink-600 rounded-lg shadow-lg p-6 text-white sticky top-4">
               <h2 className="text-lg font-bold mb-6">Order Summary</h2>
 
               {/* Items */}

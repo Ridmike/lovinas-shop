@@ -1,4 +1,5 @@
 import { getApp, getApps, initializeApp, type FirebaseApp } from "firebase/app";
+import { getAnalytics, isSupported, type Analytics } from "firebase/analytics";
 import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
@@ -10,10 +11,20 @@ const firebaseConfig = {
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? "",
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID ?? "",
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID ?? "",
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID ?? "",
 };
 
-const isConfigured = Object.values(firebaseConfig).every(Boolean);
+const isConfigured = [
+  firebaseConfig.apiKey,
+  firebaseConfig.authDomain,
+  firebaseConfig.projectId,
+  firebaseConfig.storageBucket,
+  firebaseConfig.messagingSenderId,
+  firebaseConfig.appId,
+].every(Boolean);
+
 let firebaseApp: FirebaseApp | null = null;
+let firebaseAnalytics: Analytics | null = null;
 
 function resolveApp() {
   if (!isConfigured) {
@@ -44,6 +55,23 @@ export function getFirebaseFirestore(): Firestore | null {
 export function getFirebaseStorage(): FirebaseStorage | null {
   const app = resolveApp();
   return app ? getStorage(app) : null;
+}
+
+export async function getFirebaseAnalytics(): Promise<Analytics | null> {
+  const app = resolveApp();
+  if (!app || typeof window === "undefined" || !firebaseConfig.measurementId) {
+    return null;
+  }
+
+  if (!firebaseAnalytics) {
+    const supported = await isSupported();
+    if (!supported) {
+      return null;
+    }
+    firebaseAnalytics = getAnalytics(app);
+  }
+
+  return firebaseAnalytics;
 }
 
 export const firebaseReady = isConfigured;

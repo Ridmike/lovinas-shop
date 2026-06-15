@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { collection, doc, setDoc } from "firebase/firestore";
+import { getFirebaseFirestore } from "@/lib/firebase";
 import { contactSchema } from "@/lib/schemas";
 
 export async function POST(request: Request) {
@@ -26,6 +28,24 @@ export async function POST(request: Request) {
       text: `${parsed.data.name}\n${parsed.data.email}\n\n${parsed.data.message}`,
     });
   }
+
+  const firestore = getFirebaseFirestore();
+  if (!firestore) {
+    return NextResponse.json(
+      { message: "Firebase is not configured." },
+      { status: 503 },
+    );
+  }
+
+  const messageRef = doc(collection(firestore, "messages"));
+  await setDoc(messageRef, {
+    name: parsed.data.name,
+    email: parsed.data.email,
+    subject: parsed.data.subject,
+    message: parsed.data.message,
+    createdAt: new Date().toISOString(),
+    readAt: null,
+  });
 
   return NextResponse.json({ message: "Message received." });
 }

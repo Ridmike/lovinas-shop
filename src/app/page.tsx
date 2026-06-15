@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { categories, featuredProducts } from "@/lib/data";
+import { getCategories, getFeaturedProducts } from "@/lib/storefront-data";
 import { CategoriesSection, FeaturedProductsSection, HeroBanner, PromotionSection, SocialSection } from "@/components/marketing-sections";
 
 export const metadata: Metadata = {
@@ -7,11 +7,13 @@ export const metadata: Metadata = {
   description: "Lovina's Shop homepage for curated gifts, hampers, craft supplies, and packaging.",
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [categories, featuredProducts] = await Promise.all([getCategories(), getFeaturedProducts(6)]);
+
   return (
     <div>
       <HeroBanner />
-      <FeaturedProductsSection products={featuredProducts.slice(0, 6)} />
+      <FeaturedProductsSection products={featuredProducts} />
       <CategoriesSection categories={categories} />
       <PromotionSection />
       <SocialSection />
