@@ -7,10 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "seed:admin": "node --env-file=.env.local scripts/seed-super-admin.mjs"
+    "seed:admin": "node --env-file=.env.local scripts/seed-super-admin.mjs",
+    "seed:products": "node scripts/seed-products.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
+    "cloudinary": "^2.10.0",
     "date-fns": "^4.4.0",
     "firebase": "^12.14.0",
     "firebase-admin": "^14.0.0",

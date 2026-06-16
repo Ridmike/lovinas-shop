@@ -117,14 +117,14 @@ export default function CartPage() {
                   {/* Price */}
                   <div className="col-span-2 text-right">
                     <p className="font-semibold text-[var(--ink)]">
-                      ₹{item.price.toLocaleString()}
+                      LKR {item.price.toLocaleString()}
                     </p>
                   </div>
 
                   {/* Total & Remove */}
                   <div className="col-span-2 flex items-center justify-end gap-3">
                     <p className="font-semibold text-[var(--ink)]">
-                      ₹{(item.price * item.quantity).toLocaleString()}
+                      LKR {(item.price * item.quantity).toLocaleString()}
                     </p>
                     <button
                       onClick={() => removeItem(item.productId)}
@@ -158,12 +158,12 @@ export default function CartPage() {
               <div className="mb-6 space-y-3 border-b border-white/20 pb-6">
                 <div className="flex justify-between text-sm">
                   <span className="opacity-90">Subtotal</span>
-                  <span className="font-semibold">₹{subtotal.toLocaleString()}</span>
+                  <span className="font-semibold">LKR {subtotal.toLocaleString()}</span>
                 </div>
                 {tax > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="opacity-90">Tax</span>
-                    <span className="font-semibold">₹{tax.toLocaleString()}</span>
+                    <span className="font-semibold">LKR {tax.toLocaleString()}</span>
                   </div>
                 )}
               </div>
@@ -171,14 +171,7 @@ export default function CartPage() {
               {/* Total */}
               <div className="mb-6 flex justify-between text-lg">
                 <span className="font-bold">Total</span>
-                <span className="font-bold">₹{total.toLocaleString()}</span>
-              </div>
-
-              {/* Payment Info */}
-              <div className="mb-6 rounded-2xl bg-white/10 p-3 text-sm">
-                <p className="mb-1 font-semibold">💳 Payment Method</p>
-                <p>Cash on Delivery (COD)</p>
-                <p className="mt-2 text-xs opacity-75">Pay at delivery</p>
+                <span className="font-bold">LKR {total.toLocaleString()}</span>
               </div>
 
               {/* Checkout Button */}
@@ -191,7 +184,7 @@ export default function CartPage() {
 
               {/* Info */}
               <p className="mt-4 text-center text-xs opacity-75">
-                Free shipping on orders above ₹5000
+                Free shipping on orders above LKR 5000
               </p>
             </div>
           </div>

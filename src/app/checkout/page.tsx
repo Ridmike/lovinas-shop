@@ -7,7 +7,8 @@ import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/store/cart-store";
 import Link from "next/link";
-import { ShoppingCart, Loader2, AlertCircle } from "lucide-react";
+import Image from "next/image";
+import { ShoppingCart, Loader2, AlertCircle, Banknote, Wallet, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import { trackFacebookEvent, trackTikTokEvent } from "@/lib/marketing";
 import {
@@ -46,6 +47,10 @@ function FieldError({ message }: { message?: string }) {
 export default function CheckoutPage() {
   const [isMounted, setIsMounted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<"COD" | "BankTransfer">("COD");
+  const [slipUrl, setSlipUrl] = useState("");
+  const [uploadingSlip, setUploadingSlip] = useState(false);
+  const [slipError, setSlipError] = useState("");
   const router = useRouter();
   const { items, clearCart } = useCartStore();
   const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -63,8 +68,8 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     setIsMounted(true);
-    trackFacebookEvent("InitiateCheckout", { value: subtotal, currency: "INR" });
-    trackTikTokEvent("InitiateCheckout", { value: subtotal, currency: "INR" });
+    trackFacebookEvent("InitiateCheckout", { value: subtotal, currency: "LKR" });
+    trackTikTokEvent("InitiateCheckout", { value: subtotal, currency: "LKR" });
     if (items.length === 0 && isMounted) {
       router.push("/cart");
     }
@@ -82,7 +87,33 @@ export default function CheckoutPage() {
     return null;
   }
 
+  async function uploadSlip(file: File) {
+    setUploadingSlip(true);
+    try {
+      const data = new FormData();
+      data.append("file", file);
+      const response = await fetch("/api/upload", { method: "POST", body: data });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload.message ?? "Slip upload failed");
+      }
+      setSlipUrl(payload.url);
+      setSlipError("");
+      toast.success("Bank slip uploaded");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Slip upload failed");
+    } finally {
+      setUploadingSlip(false);
+    }
+  }
+
   const onSubmit = async (data: CheckoutFormData) => {
+    if (paymentMethod === "BankTransfer" && !slipUrl) {
+      setSlipError("Please upload your bank transfer slip");
+      toast.error("Bank transfer slip is required");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const response = await fetch("/api/orders", {
@@ -93,6 +124,8 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           customer: data,
           items,
+          paymentMethod,
+          paymentSlipUrl: paymentMethod === "BankTransfer" ? slipUrl : undefined,
         }),
       });
 
@@ -103,8 +136,8 @@ export default function CheckoutPage() {
 
       const { order } = await response.json();
 
-      trackFacebookEvent("Purchase", { value: total, currency: "INR", order_id: order.orderNumber });
-      trackTikTokEvent("CompletePayment", { value: total, currency: "INR", order_id: order.orderNumber });
+      trackFacebookEvent("Purchase", { value: total, currency: "LKR", order_id: order.orderNumber });
+      trackTikTokEvent("CompletePayment", { value: total, currency: "LKR", order_id: order.orderNumber });
 
       // Clear cart and redirect to success page
       clearCart();
@@ -188,15 +221,87 @@ export default function CheckoutPage() {
             {/* Payment Information */}
             <Card className="p-6">
               <SectionHeading className="mb-4 text-xl">Payment Method</SectionHeading>
-              <div className="flex items-start gap-3 rounded-2xl border border-[var(--border-soft)] bg-[var(--surface-accent)] p-4">
-                <div className="text-2xl">💳</div>
-                <div>
-                  <p className="font-semibold text-[var(--ink)]">Cash on Delivery (COD)</p>
-                  <p className="mt-1 text-sm text-[var(--ink)]/70">
-                    Pay the full amount at the time of delivery. Our delivery partner will collect payment from you.
-                  </p>
-                </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod("COD")}
+                  className={`flex items-start gap-3 rounded-2xl border p-4 text-left transition ${
+                    paymentMethod === "COD"
+                      ? "border-[var(--brand)] bg-[var(--surface-accent)] ring-2 ring-[var(--brand)]/30"
+                      : "border-[var(--border-soft)] hover:border-[var(--brand)]/40"
+                  }`}
+                >
+                  <Wallet className="h-6 w-6 text-[var(--brand)]" />
+                  <div>
+                    <p className="font-semibold text-[var(--ink)]">Cash on Delivery</p>
+                    <p className="mt-1 text-sm text-[var(--ink)]/70">Pay when your order is delivered.</p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPaymentMethod("BankTransfer")}
+                  className={`flex items-start gap-3 rounded-2xl border p-4 text-left transition ${
+                    paymentMethod === "BankTransfer"
+                      ? "border-[var(--brand)] bg-[var(--surface-accent)] ring-2 ring-[var(--brand)]/30"
+                      : "border-[var(--border-soft)] hover:border-[var(--brand)]/40"
+                  }`}
+                >
+                  <Banknote className="h-6 w-6 text-[var(--brand)]" />
+                  <div>
+                    <p className="font-semibold text-[var(--ink)]">Bank Transfer</p>
+                    <p className="mt-1 text-sm text-[var(--ink)]/70">Transfer and upload your deposit slip.</p>
+                  </div>
+                </button>
               </div>
+
+              {paymentMethod === "BankTransfer" && (
+                <div className="mt-4 space-y-4 rounded-2xl border border-[var(--border-soft)] bg-[var(--surface-accent)] p-4">
+                  <div className="text-sm text-[var(--ink)]/80">
+                    <p className="font-semibold text-[var(--ink)]">Transfer to:</p>
+                    <p className="mt-1">Lovina&apos;s Shop · Bank of Ceylon</p>
+                    <p>Account No: 0000 0000 0000</p>
+                    <p>Branch: Colombo</p>
+                  </div>
+
+                  <div>
+                    <Label className="mb-2 block">Upload Bank Transfer Slip *</Label>
+
+                    {slipUrl ? (
+                      <div className="relative inline-block">
+                        <div className="relative h-40 w-40 overflow-hidden rounded-2xl border border-[var(--border-soft)] bg-white">
+                          <Image src={slipUrl} alt="Bank transfer slip" fill className="object-cover" />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setSlipUrl("")}
+                          className="absolute -right-2 -top-2 rounded-full bg-[var(--destructive)] p-1.5 text-white shadow"
+                          title="Remove slip"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-[var(--brand)]/30 bg-white px-4 py-2 text-sm font-semibold text-[var(--brand)] transition hover:border-[var(--brand)]/50">
+                        {uploadingSlip ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                        {uploadingSlip ? "Uploading..." : "Upload slip"}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(event) => {
+                            const file = event.target.files?.[0];
+                            if (file) void uploadSlip(file);
+                          }}
+                        />
+                      </label>
+                    )}
+
+                    <FieldError message={slipError} />
+                  </div>
+                </div>
+              )}
             </Card>
 
             {/* Submit Button */}
@@ -238,7 +343,7 @@ export default function CheckoutPage() {
                   <span className="opacity-90">
                     {item.name} × {item.quantity}
                   </span>
-                  <span className="font-semibold">₹{(item.price * item.quantity).toLocaleString()}</span>
+                  <span className="font-semibold">LKR {(item.price * item.quantity).toLocaleString()}</span>
                 </div>
               ))}
             </div>
@@ -247,12 +352,12 @@ export default function CheckoutPage() {
             <div className="mb-6 space-y-3 border-b border-white/20 pb-6">
               <div className="flex justify-between text-sm">
                 <span className="opacity-90">Subtotal</span>
-                <span className="font-semibold">₹{subtotal.toLocaleString()}</span>
+                <span className="font-semibold">LKR {subtotal.toLocaleString()}</span>
               </div>
               {tax > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="opacity-90">Tax</span>
-                  <span className="font-semibold">₹{tax.toLocaleString()}</span>
+                  <span className="font-semibold">LKR {tax.toLocaleString()}</span>
                 </div>
               )}
             </div>
@@ -260,7 +365,7 @@ export default function CheckoutPage() {
             {/* Total */}
             <div className="mb-6 flex justify-between text-lg">
               <span className="font-bold">Total</span>
-              <span className="font-bold">₹{total.toLocaleString()}</span>
+              <span className="font-bold">LKR {total.toLocaleString()}</span>
             </div>
 
             {/* Info */}

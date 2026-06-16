@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAdminSession, hasAdminAccess } from "@/lib/admin-auth";
-import { deleteCategory, upsertCategory } from "@/lib/admin-data";
+import { deleteCategory, DuplicateCategoryError, upsertCategory } from "@/lib/admin-data";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await getAdminSession();
@@ -14,8 +14,15 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     return NextResponse.json({ message: "Invalid request body" }, { status: 400 });
   }
 
-  const category = await upsertCategory(id, body);
-  return NextResponse.json({ category });
+  try {
+    const category = await upsertCategory(id, body);
+    return NextResponse.json({ category });
+  } catch (error) {
+    if (error instanceof DuplicateCategoryError) {
+      return NextResponse.json({ message: error.message }, { status: 409 });
+    }
+    throw error;
+  }
 }
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {

@@ -1,5 +1,5 @@
 import { getAdminFirestore } from "@/lib/firebase-admin";
-import type { Order, OrderItem, CheckoutFormData, PaymentStatus, OrderStatus } from "@/types/order";
+import type { Order, OrderItem, CheckoutFormData, PaymentMethod, PaymentStatus, OrderStatus } from "@/types/order";
 import type { CartItem } from "@/store/cart-store";
 
 const ORDERS_COLLECTION = "orders";
@@ -39,6 +39,7 @@ function calculateOrderTotals(items: CartItem[]): {
 export async function createOrder(
   checkoutData: CheckoutFormData,
   cartItems: CartItem[],
+  payment: { method: PaymentMethod; slipUrl?: string } = { method: "COD" },
 ): Promise<Order> {
   const firestore = getAdminFirestore();
 
@@ -74,7 +75,8 @@ export async function createOrder(
     subtotal,
     tax,
     total,
-    paymentMethod: "COD",
+    paymentMethod: payment.method,
+    paymentSlipUrl: payment.slipUrl ?? "",
     paymentStatus: "unpaid",
     status: "pending",
     createdAt: now,

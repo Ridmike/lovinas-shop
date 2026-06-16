@@ -4,9 +4,14 @@ import { useState } from "react";
 import { CheckCheck, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import type { AdminMessage } from "@/types/admin";
+import { Pagination } from "@/components/ui/pagination";
+import { usePagination } from "@/components/ui/use-pagination";
+
+const PAGE_SIZE = 8;
 
 export function MessageManager({ messages }: { messages: AdminMessage[] }) {
   const [items, setItems] = useState(messages);
+  const { page, setPage, totalPages, pageItems } = usePagination(items, PAGE_SIZE);
 
   async function markRead(id: string) {
     const response = await fetch("/admin/api/messages", {
@@ -33,8 +38,9 @@ export function MessageManager({ messages }: { messages: AdminMessage[] }) {
   }
 
   return (
-    <div className="space-y-3">
-      {items.map((message) => (
+    <div className="space-y-6">
+      <div className="space-y-3">
+      {pageItems.map((message) => (
         <article key={message.id} className="rounded-[1.5rem] border border-black/5 bg-white p-4 shadow-sm">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
@@ -55,6 +61,8 @@ export function MessageManager({ messages }: { messages: AdminMessage[] }) {
           </div>
         </article>
       ))}
+      </div>
+      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
   );
 }

@@ -73,17 +73,17 @@ export default async function OrderSuccessPage({ params }: PageProps) {
             </div>
             <div className="flex justify-between">
               <span className="text-[var(--ink)]/60">Subtotal</span>
-              <span className="font-semibold">₹{order.subtotal.toLocaleString()}</span>
+              <span className="font-semibold">LKR {order.subtotal.toLocaleString()}</span>
             </div>
             {order.tax > 0 && (
               <div className="flex justify-between">
                 <span className="text-[var(--ink)]/60">Tax</span>
-                <span className="font-semibold">₹{order.tax.toLocaleString()}</span>
+                <span className="font-semibold">LKR {order.tax.toLocaleString()}</span>
               </div>
             )}
             <div className="flex justify-between border-t border-[var(--border-soft)] pt-3">
               <span className="font-bold text-[var(--ink)]">Total</span>
-              <span className="text-lg font-bold text-[var(--brand)]">₹{order.total.toLocaleString()}</span>
+              <span className="text-lg font-bold text-[var(--brand)]">LKR {order.total.toLocaleString()}</span>
             </div>
           </div>
         </Card>
@@ -124,11 +124,11 @@ export default async function OrderSuccessPage({ params }: PageProps) {
               <div>
                 <p className="font-semibold text-[var(--ink)]">{item.name}</p>
                 <p className="text-sm text-[var(--ink)]/60">
-                  ₹{item.price.toLocaleString()} × {item.quantity}
+                  LKR {item.price.toLocaleString()} × {item.quantity}
                 </p>
               </div>
               <p className="font-semibold text-[var(--ink)]">
-                ₹{item.subtotal.toLocaleString()}
+                LKR {item.subtotal.toLocaleString()}
               </p>
             </div>
           ))}

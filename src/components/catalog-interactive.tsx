@@ -95,49 +95,6 @@ export function SearchControls({ categories }: { categories: Category[] }) {
   );
 }
 
-export function Pagination({
-  currentPage,
-  totalPages,
-  pathname,
-  searchParams,
-}: {
-  currentPage: number;
-  totalPages: number;
-  pathname: string;
-  searchParams: URLSearchParams;
-}) {
-  if (totalPages <= 1) {
-    return null;
-  }
-
-  const createHref = (page: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("page", String(page));
-    const queryString = params.toString();
-    return queryString ? `${pathname}?${queryString}` : pathname;
-  };
-
-  const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
-
-  return (
-    <nav aria-label="Pagination" className="flex flex-wrap items-center justify-center gap-2">
-      {pages.map((page) => (
-        <a
-          key={page}
-          href={createHref(page)}
-          className={`inline-flex h-10 min-w-10 items-center justify-center rounded-full px-4 text-sm font-semibold transition ${
-            page === currentPage
-              ? "bg-[#9a3d2f] text-white"
-              : "bg-white text-slate-700 hover:bg-[#fff4ea]"
-          }`}
-        >
-          {page}
-        </a>
-      ))}
-    </nav>
-  );
-}
-
 export function ProductGallery({ product }: { product: Product }) {
   const [activeImage, setActiveImage] = useState(product.images[0]);
 
@@ -212,8 +169,8 @@ export function AddToCartButton({ product }: { product: Product }) {
             },
             quantity,
           );
-          trackFacebookEvent("AddToCart", { content_name: product.name, content_ids: [product.id], value: product.price * quantity, currency: "INR" });
-          trackTikTokEvent("AddToCart", { content_name: product.name, content_id: product.id, value: product.price * quantity, currency: "INR" });
+          trackFacebookEvent("AddToCart", { content_name: product.name, content_ids: [product.id], value: product.price * quantity, currency: "LKR" });
+          trackTikTokEvent("AddToCart", { content_name: product.name, content_id: product.id, value: product.price * quantity, currency: "LKR" });
           toast.success(`${product.name} added to your cart.`);
         }}
         className="inline-flex items-center gap-2 rounded-full bg-[#9a3d2f] px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-[#9a3d2f]/20 transition hover:bg-[#7d2e23]"

@@ -30,10 +30,10 @@ function generateOrderConfirmationHTML(order: Order): string {
         ${item.quantity}
       </td>
       <td style="padding: 12px 8px; border-bottom: 1px solid #e0e0e0; font-size: 14px; text-align: right;">
-        ₹${item.price.toLocaleString()}
+        LKR ${item.price.toLocaleString()}
       </td>
       <td style="padding: 12px 8px; border-bottom: 1px solid #e0e0e0; font-size: 14px; text-align: right;">
-        ₹${item.subtotal.toLocaleString()}
+        LKR ${item.subtotal.toLocaleString()}
       </td>
     </tr>
   `,
@@ -225,12 +225,12 @@ function generateOrderConfirmationHTML(order: Order): string {
       <div class="summary">
         <div class="summary-row">
           <span>Subtotal:</span>
-          <span>₹${order.subtotal.toLocaleString()}</span>
+          <span>LKR ${order.subtotal.toLocaleString()}</span>
         </div>
-        ${order.tax > 0 ? `<div class="summary-row"><span>Tax:</span><span>₹${order.tax.toLocaleString()}</span></div>` : ""}
+        ${order.tax > 0 ? `<div class="summary-row"><span>Tax:</span><span>LKR ${order.tax.toLocaleString()}</span></div>` : ""}
         <div class="summary-row total">
           <span>Total:</span>
-          <span>₹${order.total.toLocaleString()}</span>
+          <span>LKR ${order.total.toLocaleString()}</span>
         </div>
       </div>
 
@@ -324,7 +324,7 @@ export async function sendAdminNotificationEmail(order: Order): Promise<void> {
     const itemsList = order.items
       .map(
         (item) =>
-          `• ${item.name} x${item.quantity} - ₹${(item.price * item.quantity).toLocaleString()}`,
+          `• ${item.name} x${item.quantity} - LKR ${(item.price * item.quantity).toLocaleString()}`,
       )
       .join("\n");
 
@@ -340,7 +340,7 @@ Address: ${order.customer.address}, ${order.customer.city}
 Items:
 ${itemsList}
 
-Total: ₹${order.total.toLocaleString()}
+Total: LKR ${order.total.toLocaleString()}
 Payment Method: ${order.paymentMethod}
 Payment Status: ${order.paymentStatus}
 

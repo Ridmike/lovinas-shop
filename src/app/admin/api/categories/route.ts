@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAdminSession, hasAdminAccess } from "@/lib/admin-auth";
-import { deleteCategory, listCategories, reorderCategories, upsertCategory } from "@/lib/admin-data";
+import { deleteCategory, DuplicateCategoryError, listCategories, reorderCategories, upsertCategory } from "@/lib/admin-data";
 
 export async function GET() {
   const session = await getAdminSession();
@@ -27,8 +27,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Categories reordered" });
   }
 
-  const category = await upsertCategory(null, body);
-  return NextResponse.json({ category }, { status: 201 });
+  try {
+    const category = await upsertCategory(null, body);
+    return NextResponse.json({ category }, { status: 201 });
+  } catch (error) {
+    if (error instanceof DuplicateCategoryError) {
+      return NextResponse.json({ message: error.message }, { status: 409 });
+    }
+    throw error;
+  }
 }
 
 export async function DELETE(request: Request) {
