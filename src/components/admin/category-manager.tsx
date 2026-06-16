@@ -5,13 +5,17 @@ import { Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import type { Category } from "@/types/catalog";
 import type { AdminCategoryFormValues } from "@/types/admin";
+import { Pagination } from "@/components/ui/pagination";
+import { usePagination } from "@/components/ui/use-pagination";
 
 const emptyCategory: AdminCategoryFormValues = { name: "", slug: "", parentCategory: null, sortOrder: 1 };
+const PAGE_SIZE = 8;
 
 export function CategoryManager({ categories }: { categories: (Category & { sortOrder?: number })[] }) {
   const [items, setItems] = useState(categories);
   const [form, setForm] = useState<AdminCategoryFormValues>(emptyCategory);
   const [saving, setSaving] = useState(false);
+  const { page, setPage, totalPages, pageItems, startIndex } = usePagination(items, PAGE_SIZE);
 
   async function save() {
     setSaving(true);
@@ -21,8 +25,8 @@ export function CategoryManager({ categories }: { categories: (Category & { sort
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      if (!response.ok) throw new Error("Unable to save category");
-      const payload = await response.json();
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.message ?? "Unable to save category");
       setItems((current) => [payload.category, ...current.filter((item) => item.id !== payload.category.id)]);
       setForm(emptyCategory);
       toast.success("Category saved");
@@ -67,7 +71,9 @@ export function CategoryManager({ categories }: { categories: (Category & { sort
       </section>
 
       <section className="space-y-3">
-        {items.map((category, index) => (
+        {pageItems.map((category, localIndex) => {
+          const index = startIndex + localIndex;
+          return (
           <article key={category.id} className="flex items-center justify-between rounded-[1.5rem] border border-black/5 bg-white p-4 shadow-sm">
             <div>
               <p className="font-semibold text-[#20303d]">{category.name}</p>
@@ -90,8 +96,11 @@ export function CategoryManager({ categories }: { categories: (Category & { sort
               </button>
             </div>
           </article>
-        ))}
+          );
+        })}
       </section>
+
+      <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} />
     </div>
   );
 }

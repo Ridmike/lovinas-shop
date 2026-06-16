@@ -71,6 +71,7 @@ function serializeOrder(id: string, data: Record<string, unknown>): Order {
     tax: Number(data.tax ?? 0),
     total: Number(data.total ?? 0),
     paymentMethod: (data.paymentMethod as Order["paymentMethod"]) ?? "COD",
+    paymentSlipUrl: typeof data.paymentSlipUrl === "string" ? data.paymentSlipUrl : "",
     paymentStatus: (data.paymentStatus as Order["paymentStatus"]) ?? "unpaid",
     status: (data.status as Order["status"]) ?? "pending",
     createdAt: toIsoDate(data.createdAt),
@@ -215,10 +216,28 @@ export async function deleteProduct(id: string) {
   await firestore.collection(PRODUCT_COLLECTION).doc(id).delete();
 }
 
+export class DuplicateCategoryError extends Error {
+  constructor(message = "A category with this name already exists") {
+    super(message);
+    this.name = "DuplicateCategoryError";
+  }
+}
+
 export async function upsertCategory(id: string | null, values: AdminCategoryFormValues) {
   const firestore = getAdminFirestore();
   if (!firestore) {
     throw new Error(getFirebaseAdminConfigMessage());
+  }
+
+  const normalizedName = (values.name ?? "").trim().toLowerCase();
+  if (normalizedName) {
+    const snapshot = await firestore.collection(CATEGORY_COLLECTION).get();
+    const duplicate = snapshot.docs.some(
+      (doc) => doc.id !== id && String(doc.data().name ?? "").trim().toLowerCase() === normalizedName,
+    );
+    if (duplicate) {
+      throw new DuplicateCategoryError();
+    }
   }
 
   const payload = {

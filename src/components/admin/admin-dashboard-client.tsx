@@ -30,7 +30,7 @@ export function AdminDashboardClient({
     () => [
       { label: "Total Orders", value: cards.totalOrders.toString(), change: "All time" },
       { label: "Pending Orders", value: cards.pendingOrders.toString(), change: "Needs action" },
-      { label: "Revenue", value: `₹${cards.revenue.toLocaleString()}`, change: "COD only" },
+      { label: "Revenue", value: `LKR ${cards.revenue.toLocaleString()}`, change: "COD only" },
       { label: "Products", value: cards.products.toString(), change: "Catalog items" },
     ],
     [cards],

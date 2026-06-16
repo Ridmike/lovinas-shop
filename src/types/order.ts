@@ -1,6 +1,6 @@
 import type { CartItem } from "@/store/cart-store";
 
-export type PaymentMethod = "COD";
+export type PaymentMethod = "COD" | "BankTransfer";
 export type PaymentStatus = "unpaid" | "paid" | "failed";
 export type OrderStatus = "pending" | "processing" | "dispatched" | "delivered" | "cancelled";
 
@@ -24,6 +24,7 @@ export interface Order {
   tax: number;
   total: number;
   paymentMethod: PaymentMethod;
+  paymentSlipUrl?: string;
   paymentStatus: PaymentStatus;
   status: OrderStatus;
   createdAt: string;

@@ -25,6 +25,11 @@ const orderRequestSchema = z.object({
       quantity: z.number().int().positive(),
     }),
   ),
+  paymentMethod: z.enum(["COD", "BankTransfer"]).default("COD"),
+  paymentSlipUrl: z.string().url().optional(),
+}).refine((data) => data.paymentMethod !== "BankTransfer" || !!data.paymentSlipUrl, {
+  message: "A bank transfer slip image is required",
+  path: ["paymentSlipUrl"],
 });
 
 export async function POST(request: NextRequest) {
@@ -43,7 +48,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { customer, items } = validation.data;
+    const { customer, items, paymentMethod, paymentSlipUrl } = validation.data;
 
     // Validate cart is not empty
     if (!items || items.length === 0) {
@@ -54,7 +59,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Create order in Firestore
-    const order = await createOrder(customer as CheckoutFormData, items as CartItem[]);
+    const order = await createOrder(customer as CheckoutFormData, items as CartItem[], {
+      method: paymentMethod,
+      slipUrl: paymentSlipUrl,
+    });
 
     // Send confirmation email to customer
     try {

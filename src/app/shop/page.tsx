@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getCategories, filterProducts } from "@/lib/storefront-data";
-import { Pagination, SearchControls } from "@/components/catalog-interactive";
+import { SearchControls } from "@/components/catalog-interactive";
+import { Pagination } from "@/components/ui/pagination";
 import { EmptyState } from "@/components/states";
 import { SectionHeading } from "@/components/marketing-sections";
 import { ProductGrid } from "@/components/catalog-static";
@@ -61,13 +62,11 @@ export default async function ShopPage({
         <Pagination
           currentPage={result.currentPage}
           totalPages={result.totalPages}
-          pathname="/shop"
-          searchParams={new URLSearchParams(
-            Object.entries(resolvedSearchParams).flatMap(([key, value]) => {
-              const values = Array.isArray(value) ? value : value ? [value] : [];
-              return values.map((item) => [key, item]);
-            }),
-          )}
+          basePath="/shop"
+          query={{
+            ...(query ? { q: query } : {}),
+            ...(category ? { category } : {}),
+          }}
         />
       </div>
 
@@ -81,7 +80,7 @@ export default async function ShopPage({
           </p>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
-          {categories.map((categoryItem) => {
+          {categories.slice(0, 6).map((categoryItem) => {
             const count = result.products.filter((product) => product.categoryId === categoryItem.id).length;
             return (
               <Link
