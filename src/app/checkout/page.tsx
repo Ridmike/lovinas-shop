@@ -10,6 +10,16 @@ import Link from "next/link";
 import { ShoppingCart, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { trackFacebookEvent, trackTikTokEvent } from "@/lib/marketing";
+import {
+  PageContainer,
+  PageTitle,
+  SectionHeading,
+  Card,
+  Button,
+  Input,
+  Textarea,
+  Label,
+} from "@/components/ui";
 
 // Validation schema
 const checkoutSchema = z.object({
@@ -22,6 +32,16 @@ const checkoutSchema = z.object({
 });
 
 type CheckoutFormData = z.infer<typeof checkoutSchema>;
+
+function FieldError({ message }: { message?: string }) {
+  if (!message) return null;
+  return (
+    <p className="mt-1 flex items-center gap-1 text-sm text-[var(--destructive)]">
+      <AlertCircle className="h-4 w-4" />
+      {message}
+    </p>
+  );
+}
 
 export default function CheckoutPage() {
   const [isMounted, setIsMounted] = useState(false);
@@ -52,11 +72,9 @@ export default function CheckoutPage() {
 
   if (!isMounted) {
     return (
-      <div className="min-h-screen bg-linear-to-b from-purple-50 to-white py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="h-screen bg-gray-200 animate-pulse rounded-lg" />
-        </div>
-      </div>
+      <PageContainer>
+        <div className="h-screen animate-pulse rounded-[var(--radius-card)] bg-black/5" />
+      </PageContainer>
     );
   }
 
@@ -102,224 +120,159 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-b from-purple-50 to-white py-12 px-4">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Checkout</h1>
-          <p className="text-gray-600">Complete your purchase</p>
+    <PageContainer>
+      {/* Header */}
+      <div className="mb-8">
+        <PageTitle className="mb-2">Checkout</PageTitle>
+        <p className="text-[var(--ink)]/70">Complete your purchase</p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        {/* Form Section */}
+        <div className="lg:col-span-2">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Shipping Information */}
+            <Card className="p-6">
+              <SectionHeading className="mb-6 text-xl">Shipping Information</SectionHeading>
+
+              <div className="space-y-4">
+                {/* Full Name */}
+                <div>
+                  <Label className="mb-2 block">Full Name *</Label>
+                  <Input {...register("fullName")} type="text" placeholder="John Doe" />
+                  <FieldError message={errors.fullName?.message} />
+                </div>
+
+                {/* Email & Phone */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="mb-2 block">Email *</Label>
+                    <Input {...register("email")} type="email" placeholder="john@example.com" />
+                    <FieldError message={errors.email?.message} />
+                  </div>
+
+                  <div>
+                    <Label className="mb-2 block">Phone Number *</Label>
+                    <Input {...register("phone")} type="tel" placeholder="9876543210" />
+                    <FieldError message={errors.phone?.message} />
+                  </div>
+                </div>
+
+                {/* Address */}
+                <div>
+                  <Label className="mb-2 block">Street Address *</Label>
+                  <Input {...register("address")} type="text" placeholder="123 Main Street" />
+                  <FieldError message={errors.address?.message} />
+                </div>
+
+                {/* City */}
+                <div>
+                  <Label className="mb-2 block">City *</Label>
+                  <Input {...register("city")} type="text" placeholder="Mumbai" />
+                  <FieldError message={errors.city?.message} />
+                </div>
+
+                {/* Notes */}
+                <div>
+                  <Label className="mb-2 block">Special Instructions (Optional)</Label>
+                  <Textarea
+                    {...register("notes")}
+                    placeholder="Any special instructions for delivery..."
+                    rows={3}
+                    className="resize-none"
+                  />
+                </div>
+              </div>
+            </Card>
+
+            {/* Payment Information */}
+            <Card className="p-6">
+              <SectionHeading className="mb-4 text-xl">Payment Method</SectionHeading>
+              <div className="flex items-start gap-3 rounded-2xl border border-[var(--border-soft)] bg-[var(--surface-accent)] p-4">
+                <div className="text-2xl">💳</div>
+                <div>
+                  <p className="font-semibold text-[var(--ink)]">Cash on Delivery (COD)</p>
+                  <p className="mt-1 text-sm text-[var(--ink)]/70">
+                    Pay the full amount at the time of delivery. Our delivery partner will collect payment from you.
+                  </p>
+                </div>
+              </div>
+            </Card>
+
+            {/* Submit Button */}
+            <Button type="submit" disabled={isSubmitting} className="w-full">
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <ShoppingCart className="h-5 w-5" />
+                  Place Order
+                </>
+              )}
+            </Button>
+
+            {/* Back to Cart */}
+            <div>
+              <Link
+                href="/cart"
+                className="font-semibold text-[var(--brand)] hover:text-[var(--brand-strong)]"
+              >
+                ← Back to Cart
+              </Link>
+            </div>
+          </form>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Form Section */}
-          <div className="lg:col-span-2">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              {/* Shipping Information */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Shipping Information</h2>
+        {/* Order Summary */}
+        <div className="lg:col-span-1">
+          <div className="sticky top-4 rounded-[var(--radius-card)] bg-[var(--ink)] p-6 text-white shadow-sm">
+            <h2 className="mb-6 font-display text-lg font-semibold">Order Summary</h2>
 
-                <div className="space-y-4">
-                  {/* Full Name */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Full Name *
-                    </label>
-                    <input
-                      {...register("fullName")}
-                      type="text"
-                      placeholder="John Doe"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition outline-none"
-                    />
-                    {errors.fullName && (
-                      <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {errors.fullName.message}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Email & Phone */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Email *
-                      </label>
-                      <input
-                        {...register("email")}
-                        type="email"
-                        placeholder="john@example.com"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition outline-none"
-                      />
-                      {errors.email && (
-                        <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                          <AlertCircle className="w-4 h-4" />
-                          {errors.email.message}
-                        </p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Phone Number *
-                      </label>
-                      <input
-                        {...register("phone")}
-                        type="tel"
-                        placeholder="9876543210"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition outline-none"
-                      />
-                      {errors.phone && (
-                        <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                          <AlertCircle className="w-4 h-4" />
-                          {errors.phone.message}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Address */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Street Address *
-                    </label>
-                    <input
-                      {...register("address")}
-                      type="text"
-                      placeholder="123 Main Street"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition outline-none"
-                    />
-                    {errors.address && (
-                      <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {errors.address.message}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* City */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      City *
-                    </label>
-                    <input
-                      {...register("city")}
-                      type="text"
-                      placeholder="Mumbai"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition outline-none"
-                    />
-                    {errors.city && (
-                      <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                        <AlertCircle className="w-4 h-4" />
-                        {errors.city.message}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Notes */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Special Instructions (Optional)
-                    </label>
-                    <textarea
-                      {...register("notes")}
-                      placeholder="Any special instructions for delivery..."
-                      rows={3}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition outline-none resize-none"
-                    />
-                  </div>
+            {/* Items */}
+            <div className="mb-6 max-h-64 space-y-3 overflow-y-auto border-b border-white/20 pb-6">
+              {items.map((item) => (
+                <div key={item.productId} className="flex justify-between text-sm">
+                  <span className="opacity-90">
+                    {item.name} × {item.quantity}
+                  </span>
+                  <span className="font-semibold">₹{(item.price * item.quantity).toLocaleString()}</span>
                 </div>
+              ))}
+            </div>
+
+            {/* Totals */}
+            <div className="mb-6 space-y-3 border-b border-white/20 pb-6">
+              <div className="flex justify-between text-sm">
+                <span className="opacity-90">Subtotal</span>
+                <span className="font-semibold">₹{subtotal.toLocaleString()}</span>
               </div>
-
-              {/* Payment Information */}
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Payment Method</h2>
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
-                  <div className="text-2xl">💳</div>
-                  <div>
-                    <p className="font-semibold text-gray-900">Cash on Delivery (COD)</p>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Pay the full amount at the time of delivery. Our delivery partner will collect payment from you.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-linear-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCart className="w-5 h-5" />
-                    Place Order
-                  </>
-                )}
-              </button>
-
-              {/* Back to Cart */}
-              <div>
-                <Link href="/cart" className="text-purple-600 hover:text-purple-700 font-semibold">
-                  ← Back to Cart
-                </Link>
-              </div>
-            </form>
-          </div>
-
-          {/* Order Summary */}
-          <div className="lg:col-span-1">
-            <div className="bg-linear-to-br from-purple-600 to-pink-600 rounded-lg shadow-lg p-6 text-white sticky top-4">
-              <h2 className="text-lg font-bold mb-6">Order Summary</h2>
-
-              {/* Items */}
-              <div className="space-y-3 mb-6 pb-6 border-b border-white/20 max-h-64 overflow-y-auto">
-                {items.map((item) => (
-                  <div key={item.productId} className="flex justify-between text-sm">
-                    <span className="opacity-90">
-                      {item.name} × {item.quantity}
-                    </span>
-                    <span className="font-semibold">₹{(item.price * item.quantity).toLocaleString()}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Totals */}
-              <div className="space-y-3 mb-6 pb-6 border-b border-white/20">
+              {tax > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="opacity-90">Subtotal</span>
-                  <span className="font-semibold">₹{subtotal.toLocaleString()}</span>
+                  <span className="opacity-90">Tax</span>
+                  <span className="font-semibold">₹{tax.toLocaleString()}</span>
                 </div>
-                {tax > 0 && (
-                  <div className="flex justify-between text-sm">
-                    <span className="opacity-90">Tax</span>
-                    <span className="font-semibold">₹{tax.toLocaleString()}</span>
-                  </div>
-                )}
-              </div>
+              )}
+            </div>
 
-              {/* Total */}
-              <div className="flex justify-between text-lg mb-6">
-                <span className="font-bold">Total</span>
-                <span className="font-bold">₹{total.toLocaleString()}</span>
-              </div>
+            {/* Total */}
+            <div className="mb-6 flex justify-between text-lg">
+              <span className="font-bold">Total</span>
+              <span className="font-bold">₹{total.toLocaleString()}</span>
+            </div>
 
-              {/* Info */}
-              <div className="bg-white/10 rounded p-3 text-sm">
-                <p className="font-semibold mb-2">✓ Items {items.length}</p>
-                <p className="text-xs opacity-75">
-                  You will receive a confirmation email after placing your order.
-                </p>
-              </div>
+            {/* Info */}
+            <div className="rounded-2xl bg-white/10 p-3 text-sm">
+              <p className="mb-2 font-semibold">✓ Items {items.length}</p>
+              <p className="text-xs opacity-75">
+                You will receive a confirmation email after placing your order.
+              </p>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 }

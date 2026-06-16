@@ -79,7 +79,7 @@ export function AdminLoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#20303d] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#16222b] disabled:opacity-60"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[var(--brand)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--brand-strong)] disabled:opacity-60"
       >
         {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <ShieldCheck className="h-4 w-4" />}
         {loading ? "Signing in..." : "Access dashboard"}

@@ -1,13 +1,4 @@
-import {
-  collection,
-  doc,
-  getDoc,
-  setDoc,
-  query,
-  where,
-  getDocs,
-} from "firebase/firestore";
-import { getFirebaseFirestore } from "@/lib/firebase";
+import { getAdminFirestore } from "@/lib/firebase-admin";
 import type { Order, OrderItem, CheckoutFormData, PaymentStatus, OrderStatus } from "@/types/order";
 import type { CartItem } from "@/store/cart-store";
 
@@ -49,7 +40,7 @@ export async function createOrder(
   checkoutData: CheckoutFormData,
   cartItems: CartItem[],
 ): Promise<Order> {
-  const firestore = getFirebaseFirestore();
+  const firestore = getAdminFirestore();
 
   if (!firestore) {
     throw new Error("Firebase not configured");
@@ -77,7 +68,7 @@ export async function createOrder(
       phone: checkoutData.phone,
       address: checkoutData.address,
       city: checkoutData.city,
-      notes: checkoutData.notes,
+      notes: checkoutData.notes ?? "",
     },
     items: orderItems,
     subtotal,
@@ -91,11 +82,10 @@ export async function createOrder(
   };
 
   try {
-    const ordersRef = collection(firestore, ORDERS_COLLECTION);
-    const docRef = doc(ordersRef);
+    const docRef = firestore.collection(ORDERS_COLLECTION).doc();
     const orderWithId: Order = { ...order, id: docRef.id };
 
-    await setDoc(docRef, orderWithId);
+    await docRef.set(orderWithId);
 
     return orderWithId;
   } catch (error) {
@@ -108,17 +98,16 @@ export async function createOrder(
  * Retrieve an order by ID
  */
 export async function getOrderById(orderId: string): Promise<Order | null> {
-  const firestore = getFirebaseFirestore();
+  const firestore = getAdminFirestore();
 
   if (!firestore) {
     throw new Error("Firebase not configured");
   }
 
   try {
-    const orderRef = doc(firestore, ORDERS_COLLECTION, orderId);
-    const orderSnap = await getDoc(orderRef);
+    const orderSnap = await firestore.collection(ORDERS_COLLECTION).doc(orderId).get();
 
-    if (orderSnap.exists()) {
+    if (orderSnap.exists) {
       return orderSnap.data() as Order;
     }
 
@@ -133,18 +122,17 @@ export async function getOrderById(orderId: string): Promise<Order | null> {
  * Retrieve orders by customer email
  */
 export async function getOrdersByEmail(email: string): Promise<Order[]> {
-  const firestore = getFirebaseFirestore();
+  const firestore = getAdminFirestore();
 
   if (!firestore) {
     throw new Error("Firebase not configured");
   }
 
   try {
-    const q = query(
-      collection(firestore, ORDERS_COLLECTION),
-      where("customer.email", "==", email),
-    );
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await firestore
+      .collection(ORDERS_COLLECTION)
+      .where("customer.email", "==", email)
+      .get();
 
     return querySnapshot.docs.map((doc) => doc.data() as Order);
   } catch (error) {
@@ -160,16 +148,14 @@ export async function updateOrderStatus(
   orderId: string,
   status: OrderStatus,
 ): Promise<void> {
-  const firestore = getFirebaseFirestore();
+  const firestore = getAdminFirestore();
 
   if (!firestore) {
     throw new Error("Firebase not configured");
   }
 
   try {
-    const orderRef = doc(firestore, ORDERS_COLLECTION, orderId);
-    await setDoc(
-      orderRef,
+    await firestore.collection(ORDERS_COLLECTION).doc(orderId).set(
       {
         status,
         updatedAt: new Date().toISOString(),
@@ -189,16 +175,14 @@ export async function updatePaymentStatus(
   orderId: string,
   paymentStatus: PaymentStatus,
 ): Promise<void> {
-  const firestore = getFirebaseFirestore();
+  const firestore = getAdminFirestore();
 
   if (!firestore) {
     throw new Error("Firebase not configured");
   }
 
   try {
-    const orderRef = doc(firestore, ORDERS_COLLECTION, orderId);
-    await setDoc(
-      orderRef,
+    await firestore.collection(ORDERS_COLLECTION).doc(orderId).set(
       {
         paymentStatus,
         updatedAt: new Date().toISOString(),
