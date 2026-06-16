@@ -51,12 +51,12 @@ export function OrderManager({ orders }: { orders: Order[] }) {
   return (
     <div className="space-y-6">
       <section className="grid gap-4 rounded-[1.75rem] border border-black/5 bg-white p-6 shadow-sm md:grid-cols-[1.2fr_0.8fr_auto]">
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search orders" className="rounded-2xl border border-black/10 px-4 py-3" />
-        <select value={status} onChange={(event) => setStatus(event.target.value)} className="rounded-2xl border border-black/10 px-4 py-3">
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search orders" className="rounded-2xl border border-black/10 bg-[var(--surface)] px-4 py-3 transition focus:border-[var(--brand)]/40 focus:outline-none focus:ring-4 focus:ring-[var(--ring-soft)]" />
+        <select value={status} onChange={(event) => setStatus(event.target.value)} className="cursor-pointer rounded-2xl border border-black/10 bg-[var(--surface)] px-4 py-3 transition focus:border-[var(--brand)]/40 focus:outline-none focus:ring-4 focus:ring-[var(--ring-soft)]">
           <option value="all">All statuses</option>
           {statuses.map((item) => <option key={item} value={item}>{item}</option>)}
         </select>
-        <button type="button" onClick={exportCsv} className="inline-flex items-center justify-center gap-2 rounded-full bg-[#20303d] px-4 py-3 text-sm font-semibold text-white">
+        <button type="button" onClick={exportCsv} className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--brand)] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[var(--brand-strong)]">
           <Download className="h-4 w-4" />
           Export CSV
         </button>

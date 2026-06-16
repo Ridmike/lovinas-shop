@@ -21,7 +21,7 @@ const orderRequestSchema = z.object({
       slug: z.string(),
       name: z.string(),
       price: z.number().positive(),
-      image: z.string(),
+      image: z.string().optional().default(""),
       quantity: z.number().int().positive(),
     }),
   ),

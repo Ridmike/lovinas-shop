@@ -52,7 +52,7 @@ export function AdminShell({ session, children }: { session: AdminUser; children
             <button
               type="button"
               onClick={logout}
-              className="inline-flex items-center gap-2 rounded-full bg-[#20303d] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#16222b]"
+              className="inline-flex items-center gap-2 rounded-full border border-[var(--brand)]/20 bg-white px-4 py-2 text-sm font-semibold text-[var(--brand)] transition hover:border-[var(--brand)]/40 hover:bg-[var(--surface-accent)]"
             >
               <LogOut className="h-4 w-4" />
               Logout
@@ -65,7 +65,10 @@ export function AdminShell({ session, children }: { session: AdminUser; children
         <aside className={`${open ? "block" : "hidden"} lg:block`}>
           <nav className="sticky top-6 rounded-[1.75rem] border border-black/5 bg-white/80 p-3 shadow-sm backdrop-blur-xl">
             {navItems.map((item) => {
-              const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+              const active =
+                item.href === "/admin"
+                  ? pathname === "/admin"
+                  : pathname === item.href || pathname.startsWith(`${item.href}/`);
               const Icon = item.icon;
 
               return (
@@ -74,7 +77,7 @@ export function AdminShell({ session, children }: { session: AdminUser; children
                   href={item.href}
                   onClick={() => setOpen(false)}
                   className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
-                    active ? "bg-[#20303d] text-white" : "text-slate-700 hover:bg-[#fff7f3] hover:text-[#9a3d2f]"
+                    active ? "bg-[var(--brand)] text-white" : "text-slate-700 hover:bg-[var(--surface-accent)] hover:text-[var(--brand)]"
                   }`}
                 >
                   <Icon className="h-4 w-4" />

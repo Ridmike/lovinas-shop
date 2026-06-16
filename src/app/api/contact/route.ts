@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
-import { collection, doc, setDoc } from "firebase/firestore";
-import { getFirebaseFirestore } from "@/lib/firebase";
+import { getAdminFirestore, getFirebaseAdminConfigMessage } from "@/lib/firebase-admin";
 import { contactSchema } from "@/lib/schemas";
 
 export async function POST(request: Request) {
@@ -29,23 +28,33 @@ export async function POST(request: Request) {
     });
   }
 
-  const firestore = getFirebaseFirestore();
+  const firestore = getAdminFirestore();
   if (!firestore) {
     return NextResponse.json(
-      { message: "Firebase is not configured." },
+      { message: getFirebaseAdminConfigMessage() },
       { status: 503 },
     );
   }
 
-  const messageRef = doc(collection(firestore, "messages"));
-  await setDoc(messageRef, {
-    name: parsed.data.name,
-    email: parsed.data.email,
-    subject: parsed.data.subject,
-    message: parsed.data.message,
-    createdAt: new Date().toISOString(),
-    readAt: null,
-  });
+  try {
+    await firestore.collection("messages").add({
+      name: parsed.data.name,
+      email: parsed.data.email,
+      subject: parsed.data.subject,
+      message: parsed.data.message,
+      createdAt: new Date().toISOString(),
+      readAt: null,
+    });
+  } catch (error) {
+    console.error("Failed to save contact message", error);
+    return NextResponse.json(
+      {
+        message: "Unable to save your message.",
+        error: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 },
+    );
+  }
 
   return NextResponse.json({ message: "Message received." });
 }

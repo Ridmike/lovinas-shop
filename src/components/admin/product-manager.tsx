@@ -129,28 +129,28 @@ export function ProductManager({ products, categories }: { products: Product[]; 
         </div>
 
         <div className="grid gap-4 md:grid-cols-2">
-          <input value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} placeholder="Product name" className="rounded-2xl border border-black/10 px-4 py-3" />
-          <input value={form.slug} onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))} placeholder="product-slug" className="rounded-2xl border border-black/10 px-4 py-3" />
-          <textarea value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} placeholder="Product description" rows={4} className="md:col-span-2 rounded-2xl border border-black/10 px-4 py-3" />
-          <input type="number" value={form.price} onChange={(event) => setForm((current) => ({ ...current, price: Number(event.target.value) }))} placeholder="Price" className="rounded-2xl border border-black/10 px-4 py-3" />
-          <select value={form.categoryId} onChange={(event) => setForm((current) => ({ ...current, categoryId: event.target.value }))} className="rounded-2xl border border-black/10 px-4 py-3">
+          <input value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} placeholder="Product name" className="rounded-2xl border border-black/10 bg-[var(--surface)] px-4 py-3 transition focus:border-[var(--brand)]/40 focus:outline-none focus:ring-4 focus:ring-[var(--ring-soft)]" />
+          <input value={form.slug} onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value }))} placeholder="product-slug" className="rounded-2xl border border-black/10 bg-[var(--surface)] px-4 py-3 transition focus:border-[var(--brand)]/40 focus:outline-none focus:ring-4 focus:ring-[var(--ring-soft)]" />
+          <textarea value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} placeholder="Product description" rows={4} className="md:col-span-2 rounded-2xl border border-black/10 bg-[var(--surface)] px-4 py-3 transition focus:border-[var(--brand)]/40 focus:outline-none focus:ring-4 focus:ring-[var(--ring-soft)]" />
+          <input type="number" value={form.price} onChange={(event) => setForm((current) => ({ ...current, price: Number(event.target.value) }))} placeholder="Price" className="rounded-2xl border border-black/10 bg-[var(--surface)] px-4 py-3 transition focus:border-[var(--brand)]/40 focus:outline-none focus:ring-4 focus:ring-[var(--ring-soft)]" />
+          <select value={form.categoryId} onChange={(event) => setForm((current) => ({ ...current, categoryId: event.target.value }))} className="rounded-2xl border border-black/10 bg-[var(--surface)] px-4 py-3 transition focus:border-[var(--brand)]/40 focus:outline-none focus:ring-4 focus:ring-[var(--ring-soft)]">
             <option value="">Select category</option>
             {categoryOptions.map((category) => (
               <option key={category.id} value={category.id}>{category.name}</option>
             ))}
           </select>
-          <label className="flex items-center gap-2 rounded-2xl border border-black/10 px-4 py-3">
+          <label className="flex items-center gap-2 rounded-2xl border border-black/10 bg-[var(--surface)] px-4 py-3 transition focus:border-[var(--brand)]/40 focus:outline-none focus:ring-4 focus:ring-[var(--ring-soft)]">
             <input type="checkbox" checked={form.featured} onChange={(event) => setForm((current) => ({ ...current, featured: event.target.checked }))} />
             Featured
           </label>
-          <label className="flex items-center gap-2 rounded-2xl border border-black/10 px-4 py-3">
+          <label className="flex items-center gap-2 rounded-2xl border border-black/10 bg-[var(--surface)] px-4 py-3 transition focus:border-[var(--brand)]/40 focus:outline-none focus:ring-4 focus:ring-[var(--ring-soft)]">
             <input type="checkbox" checked={form.inStock} onChange={(event) => setForm((current) => ({ ...current, inStock: event.target.checked }))} />
             In stock
           </label>
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-3">
-          <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-[#20303d] px-4 py-2 text-sm font-semibold text-white">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-brand/20 bg-white px-4 py-2 text-sm font-semibold text-brand transition hover:border-brand/40 hover:bg-surface-accent">
             {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
             Upload image
             <input type="file" accept="image/*" className="hidden" onChange={(event) => {
@@ -160,7 +160,7 @@ export function ProductManager({ products, categories }: { products: Product[]; 
               }
             }} />
           </label>
-          <button type="button" onClick={submit} disabled={saving} className="inline-flex items-center gap-2 rounded-full bg-[#9a3d2f] px-4 py-2 text-sm font-semibold text-white">
+          <button type="button" onClick={submit} disabled={saving} className="inline-flex items-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-strong disabled:opacity-60">
             {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : editingId ? <Pencil className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
             {editingId ? "Update product" : "Create product"}
           </button>
@@ -195,7 +195,7 @@ export function ProductManager({ products, categories }: { products: Product[]; 
               </div>
               <div className="flex flex-col gap-2 sm:flex-row">
                 <button type="button" onClick={() => startEdit(product)} className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold">Edit</button>
-                <button type="button" onClick={() => removeProduct(product.id)} className="inline-flex items-center gap-2 rounded-full bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700">
+                <button type="button" onClick={() => removeProduct(product.id)} className="inline-flex items-center gap-2 rounded-full bg-destructive-bg px-4 py-2 text-sm font-semibold text-destructive transition hover:bg-destructive hover:text-white">
                   <Trash2 className="h-4 w-4" />
                   Delete
                 </button>

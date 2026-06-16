@@ -47,7 +47,7 @@ export function MessageManager({ messages }: { messages: AdminMessage[] }) {
                 <CheckCheck className="h-4 w-4" />
                 Mark read
               </button>
-              <button type="button" onClick={() => remove(message.id)} className="inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">
+              <button type="button" onClick={() => remove(message.id)} className="inline-flex items-center gap-2 rounded-full bg-destructive-bg px-3 py-2 text-sm font-semibold text-destructive transition hover:bg-destructive hover:text-white">
                 <Trash2 className="h-4 w-4" />
                 Delete
               </button>
